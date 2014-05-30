@@ -4,6 +4,7 @@ import Window
 import Graphics.Collage
 import Dict     as D
 import Keyboard as K
+import Text     as T
 import Debug (log)
 
 import Types   (..)
@@ -19,8 +20,7 @@ tileRect x y w h = foldl (\xp tiles -> concat
                    [] [x..(x+w-1)]
 
 defaultGame : GameState
-defaultGame = { gameSize    = (1280, 720)
-              , gameTime    = 0
+defaultGame = { gameTime    = 0
               , gameCursor  = defaultCursor
               , gameMode    = Playing::[]
               , gameStation = defaultStation
@@ -28,26 +28,32 @@ defaultGame = { gameSize    = (1280, 720)
 
 draw : (Int, Int) -> GameState -> Element
 draw (w, h) gs =
-    let (gw, gh) = gs.gameSize
-        mode     = head gs.gameMode
-    in  color (rgb 32 32 32) <|
-        container w h middle <|
-        collage gw gh
-          <| filled (rgb 0 0 0) (rect (toFloat gw) (toFloat gh))
-          :: drawStation gs.gameStation
-          :: printMode mode gw gh
-          :: if | mode == Building -> drawCursor gs.gameCursor gs.gameTime :: []
-                | otherwise        -> []
+    let (gw, gh) = (w - 256 - 24, h - 16)
+        mode = head gs.gameMode
+    in  beside (
+          color (rgb 32 32 32) <|
+          container (gw + 12) h (topLeftAt (absolute 8) (absolute 8)) <|
+          collage gw gh
+            <| filled (rgb 0 0 0) (rect (toFloat gw) (toFloat gh))
+            :: drawStation gs.gameStation
+            :: if | mode == Building -> drawCursor gs.gameCursor gs.gameTime :: []
+                  | otherwise        -> []
+        ) (
+          color (rgb 32 32 32) <|
+          container (w - (gw + 12)) h (topRightAt (absolute 8) (absolute 8)) <|
+          layers <| (color black <| spacer 256 gh) :: (
+          flow down <| map (leftAligned . T.color white)
+            [ toText <| modeString mode
+            , toText "Test"
+            ]) :: []
+        )
 
-printMode : Mode -> Int -> Int -> Form
-printMode mode w h =
-    let text = case mode of
-                 Building -> "Building"
-                 Paused   -> "Paused"
-                 _        -> ""
-    in  plainText text |> color (rgb 128 128 128)
-                       |> toForm
-                       |> move (0, (toFloat h / 2) - 8)
+modeString : Mode -> String
+modeString mode =
+    case mode of
+      Building -> "Building"
+      Paused   -> "Paused"
+      Playing  -> "Playing"
 
 gameState = foldp step defaultGame input
 

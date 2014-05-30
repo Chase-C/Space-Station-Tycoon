@@ -25,8 +25,7 @@ data Mode = Playing | Paused | Building
 data Cursor = Position  (Int, Int)
             | Selection (Int, Int) (Int, Int)
 
-type GameState = { gameSize    : (Int, Int)
-                 , gameTime    : Time
+type GameState = { gameTime    : Time
                  , gameCursor  : Cursor
                  , gameMode    : [Mode] -- Used as a stack
                  , gameStation : Station

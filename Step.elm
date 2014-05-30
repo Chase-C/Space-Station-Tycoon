@@ -55,11 +55,10 @@ pause gs =
 
 build : GameState -> GameState
 build gs =
-    let (x, y) = gs.gameSize
-    in  case head gs.gameMode of
-          Building -> gs
-          _        -> { gs | gameMode   <- Building::gs.gameMode
-                           , gameCursor <- defaultCursor }
+    case head gs.gameMode of
+      Building -> gs
+      _        -> { gs | gameMode   <- Building::gs.gameMode
+                       , gameCursor <- defaultCursor }
 
 enter : GameState -> GameState
 enter gs =
