@@ -13,12 +13,6 @@ import Step    (..)
 import Cursor  (..)
 import Station (..)
 
-tileRect : Int -> Int -> Int -> Int -> [((Float, Float), Tile)]
-tileRect x y w h = foldl (\xp tiles -> concat 
-                     [ map (\yp -> ((toFloat xp, toFloat yp), {tileType = 1})) [y..(y+h-1)]
-                     , tiles ])
-                   [] [x..(x+w-1)]
-
 defaultGame : GameState
 defaultGame = { gameTime    = 0
               , gameCursor  = defaultCursor

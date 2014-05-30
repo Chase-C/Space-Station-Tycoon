@@ -15,8 +15,13 @@ data Modal = Pause
 
 ---------------- Game Objects ----------------
 
-type Tile    = { tileType : Int }
-type Station = { tiles : Dict (Float, Float) Tile }
+data Tile = Floor
+          | Wall
+          | Door
+
+type Station = { tiles : Array2D Tile
+               , form  : Form
+               }
 
 ---------------- Game State ----------------
 
@@ -29,4 +34,11 @@ type GameState = { gameTime    : Time
                  , gameCursor  : Cursor
                  , gameMode    : [Mode] -- Used as a stack
                  , gameStation : Station
+                 }
+
+---------------- Util Objects ----------------
+
+type Array2D a = { width  : Int
+                 , height : Int
+                 , array  : Array a
                  }
