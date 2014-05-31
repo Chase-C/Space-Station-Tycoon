@@ -2,31 +2,39 @@ module Station where
 
 import Window
 import Graphics.Collage
-import Dict     as D
+import Array2D  as A
 import Keyboard as K
 
 import Types (..)
 
-defaultStation = { tiles = tileRect Floor (-3, -3) (3, 3) }
-
-tileRect : Tile -> (Int, Int) -> (Int, Int) -> D.Dict (Float, Float) Tile
-tileRect tileType (x1, y1) (x2, y2) =
-    let (lx, ux) = if x1 > x2 then (x2, x1) else (x1, x2)
-        (ly, uy) = if y1 > y2 then (y2, y1) else (y1, y2)
-    in   D.fromList <| foldl (\xp tiles -> concat 
-                       [ map (\yp -> ((toFloat xp, toFloat yp), tileType)) [ly..uy]
-                       , tiles ])
-                     [] [lx..ux]
+--defaultTiles = A.setRect (0, 0) (7, 7) Floor <| A.createFilled 64 64 Empty
+defaultTiles = A.filled 48 48 Empty
+defaultStation = { tiles = defaultTiles
+                 , form  = drawTiles defaultTiles
+                 }
 
 addToStation : Station -> Cursor -> Station
 addToStation station cursor =
     case cursor of
       Position _      -> station
-      Selection p1 p2 -> { station | tiles <- D.union station.tiles <| tileRect Floor p1 p2 }
-          
+      Selection p1 p2 -> let newTiles = A.setRect p1 p2 Floor station.tiles
+                         in  { tiles = newTiles
+                             , form  = drawTiles newTiles
+                             }
 
-drawTile : ((Float, Float), Tile) -> Form
-drawTile ((x, y), tile) = rect 16 16 |> filled (rgb 0 255 128) |> move (x * 16, y * 16)
+drawTile : (Int, Int) -> (Int, Int) -> Tile -> Form
+drawTile (w, h) (x, y) tile =
+    rect 16 16 |> filled
+        (case tile of
+          Floor -> (rgb 0   255 128)
+          Wall  -> (rgb 0   128 255)
+          Door  -> (rgb 128 128 128)
+          Empty -> (rgb 64  64  64 ))
+    |> move (toFloat (x - w) * 16, toFloat (y - h) * 16)
+
+drawTiles : Array2D Tile -> Form
+drawTiles arr = group <| A.toList
+                      <| A.indexedMap (drawTile (div arr.width 2, div arr.height 2)) arr
 
 drawStation : Station -> Form
-drawStation station = group <| map drawTile <| D.toList station.tiles
+drawStation station = station.form

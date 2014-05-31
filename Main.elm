@@ -38,7 +38,7 @@ draw (w, h) gs =
           layers <| (color black <| spacer 256 gh) :: (
           flow down <| map (leftAligned . T.color white)
             [ toText <| modeString mode
-            , toText "Test"
+            , toText "test"
             ]) :: []
         )
 

@@ -1,6 +1,6 @@
 module Types where
 
-import Dict (Dict)
+import Array (Array)
 
 ---------------- Input ----------------
 
@@ -18,6 +18,7 @@ data Modal = Pause
 data Tile = Floor
           | Wall
           | Door
+          | Empty
 
 type Station = { tiles : Array2D Tile
                , form  : Form
@@ -40,5 +41,5 @@ type GameState = { gameTime    : Time
 
 type Array2D a = { width  : Int
                  , height : Int
-                 , array  : Array a
+                 , array  : Array (Array a)
                  }
