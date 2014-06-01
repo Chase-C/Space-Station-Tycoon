@@ -14,23 +14,26 @@ import Cursor  (..)
 import Station (..)
 
 defaultGame : GameState
-defaultGame = { gameTime    = 0
-              , gameCursor  = defaultCursor
-              , gameMode    = Playing::[]
-              , gameStation = defaultStation
+defaultGame = { gameTime      = 0
+              , gameCursor    = defaultCursor
+              , gameMode      = Playing::[]
+              , gameStation   = defaultStation
+              , gameInventory = { credits = 100, ore = 50 }
               }
 
 draw : (Int, Int) -> GameState -> Element
 draw (w, h) gs =
     let (gw, gh) = (w - 256 - 24, h - 16)
-        mode = head gs.gameMode
+        mode     = head gs.gameMode
     in  beside (
           color (rgb 32 32 32) <|
           container (gw + 12) h (topLeftAt (absolute 8) (absolute 8)) <|
           collage gw gh
             <| filled (rgb 0 0 0) (rect (toFloat gw) (toFloat gh))
             :: drawStation gs.gameStation
-            :: if | mode == Building -> drawCursor gs.gameCursor gs.gameTime :: []
+            :: if | mode == Building -> drawCursor gs.gameCursor
+                                                   gs.gameTime
+                                                   gs.gameInventory.ore :: []
                   | otherwise        -> []
         ) (
           color (rgb 32 32 32) <|
@@ -38,7 +41,8 @@ draw (w, h) gs =
           layers <| (color black <| spacer 256 gh) :: (
           flow down <| map (leftAligned . T.color white)
             [ toText <| modeString mode
-            , toText "test"
+            , toText <| "Credits: " ++ show gs.gameInventory.credits
+            , toText <| "Ore:       " ++ show gs.gameInventory.ore
             ]) :: []
         )
 

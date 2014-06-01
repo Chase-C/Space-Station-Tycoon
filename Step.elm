@@ -30,10 +30,14 @@ updateCursor : Int -> Int -> GameState -> GameState
 updateCursor x y gameState =
     case head gameState.gameMode of
       Building -> case gameState.gameCursor of
-                    Position (cx, cy) ->
-                        { gameState | gameCursor <- Position (cx + x, cy + y) }
-                    Selection p (cx, cy) ->
-                        { gameState | gameCursor <- Selection p (cx + x, cy + y) }
+                    Position (cx, cy) _ ->
+                        { gameState | gameCursor <- Position (cx + x, cy + y)
+                                                      <| rgb 128 128 128 }
+                    Selection (ex, ey) (cx, cy) _ ->
+                        let col = if abs ((ex - cx) * (ey - cy)) > gameState.gameInventory.ore
+                                    then rgb 222 128 128
+                                    else rgb 128 128 128
+                        in  { gameState | gameCursor <- Selection (ex, ey) (cx + x, cy + y) col }
       _        -> gameState
 
 ---------------- Mode Switching ----------------
@@ -64,9 +68,9 @@ enter : GameState -> GameState
 enter gs =
     case head gs.gameMode of
       Building -> case gs.gameCursor of
-                    Position _ ->
+                    Position _ _ ->
                       { gs | gameCursor <- enterCursor gs.gameCursor }
-                    Selection _ _ ->
+                    Selection _ _ _ ->
                       { gs | gameCursor  <- enterCursor gs.gameCursor
                            , gameStation <- addToStation gs.gameStation gs.gameCursor }
       _        -> gs
@@ -74,5 +78,8 @@ enter gs =
 exit : GameState -> GameState
 exit gs =
     case head gs.gameMode of
-      Playing -> gs
-      _       -> { gs | gameMode <- tail gs.gameMode }
+      Playing  -> gs
+      Building -> case gs.gameCursor of
+                    Position  _ _   -> gs
+                    Selection _ p _ -> { gs | gameCursor <- Position p <| rgb 128 128 128 }
+      _        -> { gs | gameMode <- tail gs.gameMode }

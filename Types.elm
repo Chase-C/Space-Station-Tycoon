@@ -24,17 +24,24 @@ type Station = { tiles : Array2D Tile
                , form  : Form
                }
 
+---------------- Player Objects ----------------
+
+type Inventory = { credits : Int
+                 , ore     : Int
+                 }
+
 ---------------- Game State ----------------
 
 data Mode = Playing | Paused | Building
 
-data Cursor = Position  (Int, Int)
-            | Selection (Int, Int) (Int, Int)
+data Cursor = Position  (Int, Int)            Color
+            | Selection (Int, Int) (Int, Int) Color
 
-type GameState = { gameTime    : Time
-                 , gameCursor  : Cursor
-                 , gameMode    : [Mode] -- Used as a stack
-                 , gameStation : Station
+type GameState = { gameTime      : Time
+                 , gameCursor    : Cursor
+                 , gameMode      : [Mode] -- Used as a stack
+                 , gameStation   : Station
+                 , gameInventory : Inventory
                  }
 
 ---------------- Util Objects ----------------

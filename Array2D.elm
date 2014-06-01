@@ -29,10 +29,11 @@ get (x, y) arr =
 
 set : (Int, Int) -> a -> Array2D a -> Array2D a
 set (x, y) obj arr =
-    case A.get x arr.array of
-      Nothing -> arr
-      Just xa -> let newArr = A.set x (A.set y obj xa) arr.array
-                 in  { arr | array <- newArr }
+    let (w, h) = (div arr.width 2, div arr.height 2)
+    in  case A.get (x + w) arr.array of
+          Nothing -> arr
+          Just xa -> let newArr = A.set (x + w) (A.set (y + h) obj xa) arr.array
+                     in  { arr | array <- newArr }
 
 setRect : (Int, Int) -> (Int, Int) -> a -> Array2D a -> Array2D a
 setRect (x1, y1) (x2, y2) obj arr =
