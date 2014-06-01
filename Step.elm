@@ -80,6 +80,6 @@ exit gs =
     case head gs.gameMode of
       Playing  -> gs
       Building -> case gs.gameCursor of
-                    Position  _ _   -> gs
+                    Position  _ _   -> { gs | gameMode <- tail gs.gameMode }
                     Selection _ p _ -> { gs | gameCursor <- Position p <| rgb 128 128 128 }
       _        -> { gs | gameMode <- tail gs.gameMode }
