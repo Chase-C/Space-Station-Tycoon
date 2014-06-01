@@ -17,8 +17,8 @@ enterCursor cursor =
       Position    (x, y) c -> Selection (x, y) (x, y) c
       Selection _ (x, y) c -> Position  (x, y)        c
 
-drawCursor : Cursor -> Time -> Int -> Form
-drawCursor cursor t ore =
+drawCursor : Cursor -> Time -> Form
+drawCursor cursor t =
     let (cx, cy, sx, sy, w, h, blink, color) =
         case cursor of
           Position  (x, y) c -> let (tx, ty) = (toFloat x * 16, toFloat y * 16)

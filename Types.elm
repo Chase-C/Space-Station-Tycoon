@@ -41,7 +41,7 @@ type GameState = { gameTime      : Time
                  , gameCursor    : Cursor
                  , gameMode      : [Mode] -- Used as a stack
                  , gameStation   : Station
-                 , gameInventory : Inventory
+                 , gameInv       : Inventory
                  }
 
 ---------------- Util Objects ----------------

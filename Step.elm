@@ -5,9 +5,10 @@ import Graphics.Collage
 import Dict     as D
 import Keyboard as K
 
-import Types   (..)
-import Cursor  (..)
-import Station (addToStation)
+import Types     (..)
+import Cursor    (..)
+import Inventory (removeOre)
+import Station   (addToStation)
 
 step : Input -> GameState -> GameState
 step input gameState =
@@ -34,7 +35,7 @@ updateCursor x y gameState =
                         { gameState | gameCursor <- Position (cx + x, cy + y)
                                                       <| rgb 128 128 128 }
                     Selection (ex, ey) (cx, cy) _ ->
-                        let col = if abs ((ex - cx) * (ey - cy)) > gameState.gameInventory.ore
+                        let col = if (abs (ex - cx) + 1) * (abs (ey - cy) + 1) > gameState.gameInv.ore
                                     then rgb 222 128 128
                                     else rgb 128 128 128
                         in  { gameState | gameCursor <- Selection (ex, ey) (cx + x, cy + y) col }
@@ -67,12 +68,17 @@ build gs =
 enter : GameState -> GameState
 enter gs =
     case head gs.gameMode of
-      Building -> case gs.gameCursor of
-                    Position _ _ ->
-                      { gs | gameCursor <- enterCursor gs.gameCursor }
-                    Selection _ _ _ ->
-                      { gs | gameCursor  <- enterCursor gs.gameCursor
-                           , gameStation <- addToStation gs.gameStation gs.gameCursor }
+      Building ->
+          case gs.gameCursor of
+            Position _ _ ->
+                { gs | gameCursor <- enterCursor gs.gameCursor }
+            Selection (x1, y1) (x2, y2) _ ->
+                let area = (abs (x1 - x2) + 1) * (abs (y1 - y2) + 1)
+                in  if area > gs.gameInv.ore
+                      then { gs | gameCursor <- Position (x2, y2) <| rgb 128 128 128 }
+                      else { gs | gameCursor  <- enterCursor gs.gameCursor
+                                , gameStation <- addToStation gs.gameStation gs.gameCursor
+                                , gameInv     <- removeOre gs.gameInv area }
       _        -> gs
 
 exit : GameState -> GameState

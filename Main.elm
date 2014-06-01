@@ -7,18 +7,19 @@ import Keyboard as K
 import Text     as T
 import Debug (log)
 
-import Types   (..)
-import Input   (..)
-import Step    (..)
-import Cursor  (..)
-import Station (..)
+import Types     (..)
+import Input     (..)
+import Step      (..)
+import Cursor    (..)
+import Inventory (..)
+import Station   (..)
 
 defaultGame : GameState
 defaultGame = { gameTime      = 0
               , gameCursor    = defaultCursor
               , gameMode      = Playing::[]
               , gameStation   = defaultStation
-              , gameInventory = { credits = 100, ore = 50 }
+              , gameInv       = defaultInventory
               }
 
 draw : (Int, Int) -> GameState -> Element
@@ -32,8 +33,7 @@ draw (w, h) gs =
             <| filled (rgb 0 0 0) (rect (toFloat gw) (toFloat gh))
             :: drawStation gs.gameStation
             :: if | mode == Building -> drawCursor gs.gameCursor
-                                                   gs.gameTime
-                                                   gs.gameInventory.ore :: []
+                                                   gs.gameTime :: []
                   | otherwise        -> []
         ) (
           color (rgb 32 32 32) <|
@@ -41,8 +41,8 @@ draw (w, h) gs =
           layers <| (color black <| spacer 256 gh) :: (
           flow down <| map (leftAligned . T.color white)
             [ toText <| modeString mode
-            , toText <| "Credits: " ++ show gs.gameInventory.credits
-            , toText <| "Ore:       " ++ show gs.gameInventory.ore
+            , toText <| "Credits: " ++   show gs.gameInv.credits
+            , toText <| "Ore:       " ++ show gs.gameInv.ore
             ]) :: []
         )
 
