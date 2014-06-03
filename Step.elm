@@ -30,7 +30,7 @@ stepGame time gs =
 updateCursor : Int -> Int -> GameState -> GameState
 updateCursor x y gameState =
     case head gameState.gameMode of
-      Building -> case gameState.gameCursor of
+      Building _ -> case gameState.gameCursor of
                     Position (cx, cy) _ ->
                         { gameState | gameCursor <- Position (cx + x, cy + y)
                                                       <| rgb 128 128 128 }
@@ -61,14 +61,14 @@ pause gs =
 build : GameState -> GameState
 build gs =
     case head gs.gameMode of
-      Building -> gs
-      _        -> { gs | gameMode   <- Building::gs.gameMode
-                       , gameCursor <- defaultCursor }
+      Building _ -> gs
+      _          -> { gs | gameMode   <- (Building Floor)::gs.gameMode
+                         , gameCursor <- defaultCursor }
 
 enter : GameState -> GameState
 enter gs =
     case head gs.gameMode of
-      Building ->
+      Building _ ->
           case gs.gameCursor of
             Position _ _ ->
                 { gs | gameCursor <- enterCursor gs.gameCursor }
@@ -84,8 +84,8 @@ enter gs =
 exit : GameState -> GameState
 exit gs =
     case head gs.gameMode of
-      Playing  -> gs
-      Building -> case gs.gameCursor of
-                    Position  _ _   -> { gs | gameMode <- tail gs.gameMode }
-                    Selection _ p _ -> { gs | gameCursor <- Position p <| rgb 128 128 128 }
-      _        -> { gs | gameMode <- tail gs.gameMode }
+      Playing    -> gs
+      Building _ -> case gs.gameCursor of
+                      Position  _ _   -> { gs | gameMode <- tail gs.gameMode }
+                      Selection _ p _ -> { gs | gameCursor <- Position p <| rgb 128 128 128 }
+      _          -> { gs | gameMode <- tail gs.gameMode }

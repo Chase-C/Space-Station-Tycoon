@@ -1,6 +1,7 @@
 module Types where
 
 import Array (Array)
+import Dict  (Dict)
 
 ---------------- Input ----------------
 
@@ -32,7 +33,9 @@ type Inventory = { credits : Int
 
 ---------------- Game State ----------------
 
-data Mode = Playing | Paused | Building
+data Mode = Playing
+          | Paused
+          | Building Tile
 
 data Cursor = Position  (Int, Int)            Color
             | Selection (Int, Int) (Int, Int) Color
@@ -50,3 +53,5 @@ type Array2D a = { width  : Int
                  , height : Int
                  , array  : Array (Array a)
                  }
+
+type BuildDict = Dict Int Tile

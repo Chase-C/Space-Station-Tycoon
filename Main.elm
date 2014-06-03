@@ -12,6 +12,7 @@ import Input     (..)
 import Step      (..)
 import Cursor    (..)
 import Inventory (..)
+import Building  (..)
 import Station   (..)
 
 defaultGame : GameState
@@ -32,26 +33,30 @@ draw (w, h) gs =
           collage gw gh
             <| filled (rgb 0 0 0) (rect (toFloat gw) (toFloat gh))
             :: drawStation gs.gameStation
-            :: if | mode == Building -> drawCursor gs.gameCursor
-                                                   gs.gameTime :: []
-                  | otherwise        -> []
+            :: case mode of
+                 Building _ -> drawCursor gs.gameCursor gs.gameTime :: []
+                 _          -> []
         ) (
           color (rgb 32 32 32) <|
           container (w - (gw + 12)) h (topRightAt (absolute 8) (absolute 8)) <|
           layers <| (color black <| spacer 256 gh) :: (
-          flow down <| map (leftAligned . T.color white)
+          flow down <| (map (leftAligned . T.color white)
             [ toText <| modeString mode
             , toText <| "Credits: " ++   show gs.gameInv.credits
             , toText <| "Ore:       " ++ show gs.gameInv.ore
-            ]) :: []
+            ]) ++
+              case mode of
+                Building _ -> [buildElement buildDict 2]
+                _          -> []
+          ) :: []
         )
 
 modeString : Mode -> String
 modeString mode =
     case mode of
-      Building -> "Building"
-      Paused   -> "Paused"
-      Playing  -> "Playing"
+      Building _ -> "Building"
+      Paused     -> "Paused"
+      Playing    -> "Playing"
 
 gameState = foldp step defaultGame input
 

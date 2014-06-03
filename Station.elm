@@ -6,6 +6,7 @@ import Array2D  as A
 import Keyboard as K
 
 import Types (..)
+import Tile  (tileToForm)
 
 --defaultTiles = A.setRect (0, 0) (7, 7) Floor <| A.createFilled 64 64 Empty
 defaultTiles = A.set (4, 0) Door
@@ -27,13 +28,7 @@ addToStation station cursor =
 
 drawTile : (Int, Int) -> (Int, Int) -> Tile -> Form
 drawTile (w, h) (x, y) tile =
-    rect 16 16 |> filled
-        (case tile of
-          Floor -> (rgb 0   255 128)
-          Wall  -> (rgb 0   128 255)
-          Door  -> (rgb 128 128 128)
-          Empty -> (rgb 32  32  32 ))
-    |> move (toFloat (x - w) * 16, toFloat (y - h) * 16)
+    tileToForm tile |> move (toFloat (x - w) * 16, toFloat (y - h) * 16)
 
 drawTiles : Array2D Tile -> Form
 drawTiles arr = group <| A.toList
